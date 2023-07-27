@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# a Bash script that displays:
-# The content of the current directory
-# In a list format
-# Where only the part of the name after the first dash is displayed
-for f in *; do echo "$f" | cut -d '-' -f 2; done
+#Write a Bash script that displays: The content of the current directory In a list format Where only the part of the name after the first dash is displayed (refer to the example)
+
+for file in *
+do
+    if [[ -f $file && $file != .* ]]; then
+        echo "${file#*-}"
+    fi
+done
