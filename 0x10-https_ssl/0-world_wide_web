@@ -1,18 +1,25 @@
 #!/usr/bin/env bash
-# write a Bash script that will display information about the subdomains
+# display information for the specified subdomain
 
-dns_config () {
-    script=$(dig "$2"."$1" | grep -A1 'ANSWER SECTION:' | tr '\t' '\n' | tail -2 | tr '\n' ' ')
-    echo "$2 $script" | awk '{print "The subdomain " $1 " is a " $2 " record and points to " $3}'
+function check_subdomain {
+    local domain=$1
+    local subdomain=$2
+
+    local record_type=$(dig +noall +answer $subdomain.$domain | awk '{print $4}')
+    local destination=$(dig +noall +answer $subdomain.$domain | awk '{print $5}')
+
+    echo "The subdomain $subdomain is a $record_type record and points to $destination"
 }
 
-if [ "$#" == 1 ]
-then
-  dns_config "$1" "www"
-  dns_config "$1" "lb-01"
-  dns_config "$1" "web-01"
-  dns_config "$1" "web-02"
-elif [ "$#" == 2 ]
-then
-  dns_config "$1" "$2"
+domain=$1
+subdomain=$2
+
+if [ -z "$subdomain" ]; then
+    check_subdomain $domain www
+    check_subdomain $domain lb-01
+    check_subdomain $domain web-01
+    check_subdomain $domain web-02
+else
+    check_subdomain $domain $subdomain
 fi
+
